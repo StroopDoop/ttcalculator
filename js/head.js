@@ -463,7 +463,7 @@ function BattleCalc999() {
 
 			Last_DMG_A[0] = Last_DMG_B[0] = wX + w_left_Minatk;
 			InnStr[0] += wX + " (" + w_left_Minatk + ")";
-			if (w998D) {
+			if (DA_effective_rate) {
 				str_bSUBname += "Double Attack chance<BR>";
 				str_bSUB += (wX * 2 + w_left_Minatk) + "~";
 			}
@@ -476,9 +476,9 @@ function BattleCalc999() {
 			var wX = w_DMG[2] + EDP_DMG(2) + w_left_Maxatk;
 			Last_DMG_A[2] = Last_DMG_B[2] = wX + w_left_Maxatk;
 			InnStr[2] += w_DMG[2] + EDP_DMG(2) + " (" + w_left_Maxatk + ")";
-			if (w998D) {
+			if (DA_effective_rate) {
 				wX = (w_DMG[2] + EDP_DMG(2)) * 2 + w_left_Maxatk;
-				str_bSUB += wX + " (" + w998D + "%)<BR>";
+				str_bSUB += wX + " (" + DA_effective_rate + "%)<BR>";
 			}
 			if (wX > n_Max_DMG && w998G < 100)
 				n_Max_DMG = wX;
@@ -574,9 +574,9 @@ function BattleCalc999() {
 
 				n_A_ActiveSkill = previous_active_skill;
 
-				let triple_attack_rate = get_triple_attack_rate();
+				let wTA = get_triple_attack_rate();
 
-				str_bSUB += san[0] + "~" + san[2] + " (" + triple_attack_rate + "% Chance)<BR>";
+				str_bSUB += san[0] + "~" + san[2] + " (" + wTA + "% Chance)<BR>";
 				TyouEnkakuSousa3dan = 0;
 				if (n_Min_DMG > san[0])
 					n_Min_DMG = san[0];
@@ -618,16 +618,23 @@ function BattleCalc999() {
 				InnStr[0] = Last_DMG_A[0] + " (" + Last_DMG_B[0] + "+" + w_KATARU[0] + ")";
 			if (Last_DMG_A[0] < n_Min_DMG && w998G < 100)
 				n_Min_DMG = Last_DMG_A[0];
-			if (w998D) {
-				if ((n_A_WeaponType == 17 || n_A_WeaponType == 21 )  && SkillSearch(427)) {
-					if (CardNumSearch(43) || EquipNumSearch(570))
-						str_bSUBname += "Double attack chance<BR>";
-					else
-						str_bSUBname += "Chain action chance<BR>";
-				} else
-					str_bSUBname += "Double attack chance<BR>";
-				str_bSUB += Last_DMG_A[0] * 2 + "~";
-			}
+			//TODO: Need to update this section so it correctly triggers on DA_effective_rate to output "Double attack chance<BR>",
+			//or on CA_effective_rate to output "Chain action chance<BR>". It is possible that both are active at the same time. 
+			//weapon conditionals can be removed here since the rate can only exist if correct equips already in place
+			//if (w998D) {
+				//if ((n_A_WeaponType == 17 || n_A_WeaponType == 21 )  && SkillSearch(427)) {
+					//if (CardNumSearch(43) || EquipNumSearch(570))
+						//str_bSUBname += "Double attack chance<BR>";
+					//else
+						//str_bSUBname += "Chain action chance<BR>";
+				//} else
+					//str_bSUBname += "Double attack chance<BR>";
+				//str_bSUB += Last_DMG_A[0] * 2 + "~";
+			//}
+
+			console.log({str_bSUBname})
+
+
 			w_DMG[0] = n_Min_DMG;
 
 			Last_DMG_B[2] = w_DMG[2] + EDP_DMG(2);
@@ -640,9 +647,9 @@ function BattleCalc999() {
 			wX += n_TAKA_DMG;
 			if (n_Max_DMG < wX && w998G < 100)
 				n_Max_DMG = wX;
-			if (w998D) {
+			if (DA_effective_rate) {
 				var wX = (w_DMG[2] + EDP_DMG(2) + w_KATARU[2]) * 2;
-				str_bSUB += wX + " (" + w998D + "%)<BR>";
+				str_bSUB += wX + " (" + DA_effective_rate + "%)<BR>";
 				wX += n_TAKA_DMG;
 				if (n_Max_DMG < wX)
 					n_Max_DMG = wX;
@@ -676,6 +683,70 @@ function BattleCalc999() {
 				for (let i = 0; i <= 2; i++)
 					InnStr[i] = combo_damage_detail[i] + " = " + san[i];
 			}
+
+			str_bSUBname = "Old Triple attack Hits:<BR>";
+			str_bSUBname += "Old Triple attack Miss:<BR>";
+			str_bSUBname += "Old Double attack Hits:<BR>";
+			str_bSUBname += "Old Double attack Miss:<BR>";
+			str_bSUBname += "Old Chain Action CRIT %:<BR>";
+			str_bSUBname += "Old Chain Action normal %:<BR>";
+			str_bSUBname += "Old Chain Action miss %:<BR>";
+			str_bSUBname += "Old Normal/ skill CRIT %:<BR>";
+			str_bSUBname += "Old Normal/ skill HIT %:<BR>";
+			str_bSUBname += "Old Normal/ skill Miss %:<BR>";
+			str_bSUBname += "Old Total Crit %:<BR>";	
+			str_bSUBname += "Old Total Hit %:<BR>";
+
+			str_bSUBname += "New Triple attack Hits:<BR>";
+			str_bSUBname += "New Triple attack Miss:<BR>";
+			str_bSUBname += "New Double attack Hits:<BR>";
+			str_bSUBname += "New Double attack Miss:<BR>";
+			str_bSUBname += "New Chain Action CRIT %:<BR>";
+			str_bSUBname += "New Chain Action normal %:<BR>";
+			str_bSUBname += "New Chain Action miss %:<BR>";
+			str_bSUBname += "New Normal/ skill CRIT %:<BR>";
+			str_bSUBname += "New Normal/ skill HIT %:<BR>";
+			str_bSUBname += "New Normal/ skill Miss %:<BR>";
+			str_bSUBname += "New Total Crit %:<BR>";	
+			str_bSUBname += "New Total Hit %:<BR>";
+
+			str_bSUB = w998B + "%<BR>";
+			str_bSUB += w998C + "%<BR>";
+			str_bSUB += w998E + "%<BR>";
+			str_bSUB += w998F + "%<BR>";
+			str_bSUB += "Not Calc'd<BR>";
+			str_bSUB += "See DA rate<BR>";
+			str_bSUB += "See DA rate<BR>";
+			str_bSUB += w998G + "%<BR>";
+			str_bSUB += w998I + "%<BR>";
+			str_bSUB += w998J + "%<BR>";
+			str_bSUB += w998G + "%<BR>";
+			str_bSUB += w_HIT + "%<BR>";
+
+			str_bSUB += TA_hits + "%<BR>";
+			str_bSUB += TA_miss + "%<BR>";
+			str_bSUB += DA_hits + "%<BR>";
+			str_bSUB += DA_miss + "%<BR>";
+			str_bSUB += CA_crits + "%<BR>";
+			str_bSUB += CA_hits + "%<BR>";
+			str_bSUB += CA_miss + "%<BR>";
+			str_bSUB += NA_crits + "%<BR>";
+			str_bSUB += NA_hits + "%<BR>";
+			str_bSUB += NA_miss + "%<BR>";
+			str_bSUB += NA_crits + CA_crits + "%<BR>";
+			str_bSUB += NA_hits + NA_crits + CA_hits + CA_crits + DA_hits + TA_hits + "%<BR>";
+
+
+
+
+
+
+
+
+
+
+
+
 
 			CastAndDelay();
 			BattleCalc998();
@@ -7926,6 +7997,13 @@ function calc()
 
 	w_HIT = Math.floor(w_HIT *100)/100;
 	w_HIT_HYOUJI = w_HIT;
+
+	w_HIT_DA = n_A_HIT + 80 - (n_B_FLEE) + SkillSearch(13); // bonus hit for Double Attack of [Double Attack] skill Lvl
+	if(w_HIT_DA > 100){
+		w_HIT_DA = 100;
+	}else if(w_HIT_DA < 5){
+		w_HIT_DA = 5;
+	}
 	if(n_A_ActiveSkill==272)
 		n_A_CRI += 20;
 	if(n_A_ActiveSkill==401)
@@ -7941,12 +8019,12 @@ function calc()
 	}
 
 	TyouEnkakuSousa3dan = 0;
-	let triple_attack_rate = get_triple_attack_rate();
-
-	// Manage [Double Attack#13] + [Chain Action#427]. Two separate variables are stored in game. Certain cards/equips grant Double Attack skill
-	// (Sidewinder Card#43, Snake Head Hat#1495 etc). Certain cards/bonuses grant Double Attack RATE (Blade of Angels#1379#12th Bonus, Gertie Card#619).
+	
+	// Manage [Triple Attack#187] + [Double Attack#13] + [Chain Action#427]. Certain cards/equips grant Double Attack skill (Sidewinder Card#43, Snake Head Hat#1495 etc). 
+	// Certain cards/bonuses grant Double Attack RATE (Blade of Angels#1379#12th Bonus, Gertie Card#619).
 	// Rate is only added if wDA != 0. Only Dagger#1, Revolver#17, Gatling Gun#20 can [Double Attack] / [Chain Action] by default regardless
-	// of [Double Attack] value. [StroopDoop]
+	// of [Double Attack] level. [StroopDoop]
+	let wTA = get_triple_attack_rate();
 	wDA = 0;
 	wCA = 0;
 	
@@ -8004,6 +8082,59 @@ function calc()
 			wCA = wCA ? wCA + 10 * CardNumSearch(619) : wCA; 
 	}
 
+	console.log({w_HIT, w_Cri, wTA, wDA, wCA})
+	// For all normal attacks and skills. Starting with 100%, Determining % that are [Triple Attack], [Double Attack]/[Chain Action], hits that crit, hits that dont crit, misses
+	let current_attack_pct = 100;
+	
+	// wTA = % of attacks that are [Triple Attack]
+	current_attack_pct = wTA;
+	TA_hits = current_attack_pct * w_HIT / 100;
+	TA_miss = current_attack_pct - TA_hits;
+	// remaining attacks at this point (non-TA)
+	current_attack_pct = 100 - wTA;
+	
+	// [Double Attack] procs before Chain Action hits (as per rA code rathena/blob/master/src/map/battle.cpp line 4324-4334)
+	DA_effective_rate = current_attack_pct * wDA / 100;
+	DA_hits = DA_effective_rate * (w_HIT_DA / 100); //uses w_HIT_DA which includes an extra +Hit bonus during Double Attack
+	DA_miss = DA_effective_rate - DA_hits;
+	// remaining attacks at this point (non-TA, non-DA)
+	current_attack_pct = current_attack_pct - DA_effective_rate;
+	
+	// [Chain Action]
+	CA_effective_rate = current_attack_pct * wCA / 100;
+	CA_crits = 0;
+	if(20 == n_A_WeaponType && SkillSearch(433))
+		CA_crits = CA_effective_rate * w_Cri / 100; // If Gatling Gun#20 && Gatling fever active, allow Chain Action crits
+	CA_hits =  (CA_effective_rate - CA_crits) * w_HIT /100;
+	CA_miss = CA_effective_rate - CA_crits - CA_hits;
+	// remaining attacks at this point (non-TA, non-DA, non-CA) which is all normal attacks
+	current_attack_pct = current_attack_pct - CA_effective_rate;
+	
+	// Normal Attacks
+	NA_crits = current_attack_pct * w_Cri / 100;
+	NA_hits = (current_attack_pct - NA_crits) * w_HIT / 100;
+	NA_miss = current_attack_pct - NA_crits - NA_hits;
+
+	// Totals
+	testsum = NA_crits + NA_hits + NA_miss + CA_miss + CA_hits + CA_crits + DA_miss + DA_hits + TA_miss + TA_hits;
+	total_miss = NA_miss + CA_miss + DA_miss + TA_miss;
+	total_hit = 100 - total_miss;
+	
+	console.log({testsum, total_miss, total_hit});
+	console.log({wTA, TA_hits, TA_miss});
+	console.log({DA_hits, DA_miss, DA_effective_rate});
+	console.log({CA_crits, CA_hits, CA_miss, CA_effective_rate});
+	console.log({NA_crits, NA_hits, NA_miss});
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
 	// Combining wDA + wCA since its possible to have both combine in certain situations (gunslinger using revolver with sidewinder card). and only wDA is used in future calculations
 	wDA = wDA + wCA * (1 - wDA / 100);
 
@@ -8015,7 +8146,7 @@ function calc()
 		
 		if (wDA && n_A_WeaponType != 17) // Increased HIT rate per Double Attack level
 			non_crit_rate *= SkillSearch(13) / 100;
-		non_crit_rate += triple_attack_rate;
+		non_crit_rate += wTA;
 		non_crit_rate += (100 - non_crit_rate) * (1 - w_Cri / 100);
 			
 		// Trigger sequence
@@ -8028,17 +8159,17 @@ function calc()
 	}
 	
 	// For all normal attacks and skills. Starting with 100%, Determining % that are [Triple Attack], [Double Attack], hits that crit, hits that dont crit, misses
-	// triple_attack_rate = % of attacks that are [Triple Attack]
-	w998A = 100 - triple_attack_rate; // A = % of attacks that are not [Triple Attack]
-	w998B = triple_attack_rate * w_HIT /100; // B = % of attacks that are [Triple Attack] that hit
-	w998C = triple_attack_rate - w998B; // C = % of attacks that are [Triple Attack] that miss
+	// wTA = % of attacks that are [Triple Attack]
+	w998A = 100 - wTA; // A = % of attacks that are not [Triple Attack]
+	w998B = wTA * w_HIT /100; // B = % of attacks that are [Triple Attack] that hit
+	w998C = wTA - w998B; // C = % of attacks that are [Triple Attack] that miss
 	w998D = w998A * wDA /100; // D = % of attacks that are [Double Attack]
 	w998E = w998D * w_HIT /100; // % of [Double Attacks] that hit
-	//w998F = w998D - w998E; // % of [Double Attacks] that miss
-	w998G = (100 - triple_attack_rate - w998D) * w_Cri /100; // G = % of attacks that are remaining (normal attacks) that crit. (used for Sharpshooting and skills that crit)
-	w998H = 100 - triple_attack_rate - w998D - crit_rate; // H = % of attacks that are non-TA,non-DA,non-crit
+	w998F = w998D - w998E; // % of [Double Attacks] that miss
+	w998G = (100 - wTA - w998D) * w_Cri /100; // G = % of attacks that are remaining (normal attacks) that crit. (used for Sharpshooting and skills that crit)
+	w998H = 100 - wTA - w998D - crit_rate; // H = % of attacks that are non-TA,non-DA,non-crit
 	w998I = w998H * w_HIT /100; // I = % of attacks that are non-TA,non-DA,non-crit that hits
-	//w998J = w998H - w998I; // J = % of attacks that are non-TA,non-DA,non-crit that miss
+	w998J = w998H - w998I; // J = % of attacks that are non-TA,non-DA,non-crit that miss
 	//w998K = w998B +w998E +w998G +w998I; // K = % of all attacks that hit. TA hit + DA hit + crits + normal hits
 	w998L = 100 - w_HIT; // L = % chance to miss
 
@@ -8864,10 +8995,10 @@ function ApplySkillAtkBonus(dmg)
 
 function BattleCalc3(w998)
 {
-	wBC3_3dan = w998B * TyouEnkakuSousa3dan;
-	wBC3_DA = w998E * w998 * 2;
+	wBC3_3dan = TA_hits * TyouEnkakuSousa3dan;
+	wBC3_DA = DA_hits * w998 * 2;
 	wBC3_Cri = w998G * n_A_CriATK[1];
-	wBC3_Normal = w998I * w998;
+	wBC3_Normal = NA_hits * w998;
 	wBC3_Miss = w998L * BattleCalc2(0);
 
 	wBC3_X = (wBC3_3dan +wBC3_DA +wBC3_Cri +wBC3_Normal +wBC3_Miss) /100;
@@ -9670,27 +9801,27 @@ function is_a_combo_skill(skill_id)
 
 function get_triple_attack_rate()
 {
-	let triple_attack_rate = 0;
+	let wTA = 0;
 	let triple_attack_lv = SkillSearch(187);
 	
 	if (triple_attack_lv)
 	{
 		// Gertie Card#619 - [Triple Attack#187] Rate + 10%
 		// Champion Chen Card#625 - [Triple Attack#187] rate + skill lv%
-		triple_attack_rate = 30 - SkillSearch(187) + 10 * CardNumSearch(619) + triple_attack_lv * CardNumSearch(625);
+		wTA = 30 - SkillSearch(187) + 10 * CardNumSearch(619) + triple_attack_lv * CardNumSearch(625);
 		
 		// Glorious Claw#1096 - [Every Refine Level] - [Triple Attack#187] rate + 3%
-		triple_attack_rate += EquipNumSearch(1096) * n_A_Weapon_ATKplus * 3;
+		wTA += EquipNumSearch(1096) * n_A_Weapon_ATKplus * 3;
 		
 		// Sura's Rampage#1512 - [Triple Attack] Rate + 20%
-		triple_attack_rate += 20 * EquipNumSearch(1512);
+		wTA += 20 * EquipNumSearch(1512);
 		
 		// Sherwood Bow#1388#7th Bonus - [Triple Attack#187] Rate + 10%
 		if (1388 == n_A_Equip[0] && SQI_Bonus_Effect.findIndex(x => x == 7) > -1)
-			triple_attack_rate += 10;
+			wTA += 10;
 	}
 	
-	return triple_attack_rate;
+	return wTA;
 }
 
 function can_attack_crit(active_skill)
